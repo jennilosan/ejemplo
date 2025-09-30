@@ -49,3 +49,5 @@ jobs:
           annotations: ${{ steps.meta.outputs.annotations }}
           provenance: true
           sbom: true
+
+# Commit de prueba para aparecer en GitHub
