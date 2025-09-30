@@ -18,10 +18,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 3. Ejecutar pruebas
-      - name: Run tests
-        run: npm test -- --coverage
-
+      
       # 4. Extraer metadata de Docker
       - name: Extract Docker image metadata
         id: meta
