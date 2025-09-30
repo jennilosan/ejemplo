@@ -6,33 +6,33 @@
 FROM node:lts-alpine AS builder
 WORKDIR /src
 
-# Instalar todas las dependencias incluyendo devDependencies
-RUN --mount=src=package.json,target=package.json \
-    --mount=src=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --also=dev
+# Copiar package.json y lockfile primero
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
 
 # Copiar el resto del código
 COPY . .
 
-# Construir la app con Vite
-RUN --mount=type=cache,target=/root/.npm npm run build
+# Construir el proyecto con SvelteKit + adapter-node
+RUN npm run build
 
 # -----------------------------
-# Stage 2: Release (runtime)
+# Stage 2: Release
 # -----------------------------
 FROM node:lts-alpine AS release
 WORKDIR /app
 
-# Copiar solo el build generado
+# Copiar build generado y package.json
 COPY --from=builder /src/build ./build
+COPY --from=builder /src/package*.json ./
 
-# Copiar package.json para instalar solo dependencies
-COPY package*.json ./
-RUN npm ci --production
+# Instalar solo dependencias de producción
+RUN npm ci --omit=dev
 
-# Exponer puerto
+# Exponer puerto (SvelteKit usa 3000 por defecto)
 EXPOSE 3000
 
-# Comando para iniciar la app
-CMD ["node", "build/index.js"]
+# Arrancar el servidor generado
+CMD ["node", "build"]
