@@ -1,38 +1,19 @@
-# syntax=docker/dockerfile:1
+#syntax=docker/dockerfile:1
 
-# -----------------------------
-# Stage 1: Builder
-# -----------------------------
+# builder installs dependencies and builds the node app
 FROM node:lts-alpine AS builder
 WORKDIR /src
-
-# Copiar package.json y lockfile primero
-COPY package*.json ./
-
-# Instalar dependencias
-RUN npm ci
-
-# Copiar el resto del código
+RUN --mount=src=package.json,target=package.json \
+    --mount=src=package-lock.json,target=package-lock.json \
+    --mount=type=cache,target=/root/.npm \
+    npm ci
 COPY . .
+RUN --mount=type=cache,target=/root/.npm \
+    npm run build
 
-# Construir el proyecto con SvelteKit + adapter-node
-RUN npm run build
-
-# -----------------------------
-# Stage 2: Release
-# -----------------------------
+# release creates the runtime image
 FROM node:lts-alpine AS release
 WORKDIR /app
-
-# Copiar build generado y package.json
-COPY --from=builder /src/build ./build
-COPY --from=builder /src/package*.json ./
-
-# Instalar solo dependencias de producción
-RUN npm ci --omit=dev
-
-# Exponer puerto (SvelteKit usa 3000 por defecto)
+COPY --from=builder /src/build .
 EXPOSE 3000
-
-# Arrancar el servidor generado
-CMD ["node", "build"]
+CMD ["node", "."]
