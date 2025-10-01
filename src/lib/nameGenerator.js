@@ -41,3 +41,4 @@ export function generateName(race, charClass) {
 
 export const availableRaces = Object.keys(racePrefixes);
 export const availableClasses = Object.keys(classSuffixes);
+//commit de prueba para github
