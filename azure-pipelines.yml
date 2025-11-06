@@ -12,7 +12,4 @@ versionSpec: '18.x' displayName: 'Instalar Node.js'
 npm run build
 displayName: 'Instalar dependencias y construir app'
 
--	task: AzureWebApp@1 inputs:
-azureSubscription: '<Nombre de la conexión de servicio>' appType: 'webAppLinux'
-appName: '<Nombre de tu Web App>'
-package: '$(System.DefaultWorkingDirectory)/*/.zip'
+
