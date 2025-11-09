@@ -1,8 +1,10 @@
 trigger:
 - main
 
+
 pool:
   vmImage: 'ubuntu-latest'
+
 
 steps:
 - task: NodeTool@0
@@ -10,7 +12,12 @@ steps:
     versionSpec: '18.x'
   displayName: 'Instalar Node.js'
 
+
 - script: |
     npm install
     npm run build
   displayName: 'Instalar dependencias y construir app'
+
+
+
+
